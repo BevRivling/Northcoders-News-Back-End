@@ -1,22 +1,39 @@
+const {
+  topicData,
+  userData,
+  articleData,
+  commentData
+} = require("../db/data/development-data/");
+const { articleJoin, commentJoin } = require("../db/utils");
+
 exports.seed = function(knex, Promise) {
-  return knex("users")
+  return knex("topics")
     .del()
     .then(function() {
-      return knex("table_name").insert([
-        { id: 1, colName: "rowValue1" },
-        { id: 2, colName: "rowValue2" },
-        { id: 3, colName: "rowValue3" }
+      return knex("topics").insert(topicData);
+    })
+    .then(() => {
+      return knex("users")
+        .del()
+        .insert(userData)
+        .returning("*");
+    })
+    .then(users => {
+      const validArticleData = articleJoin(articleData, users);
+      return Promise.all([
+        knex("articles")
+          .del()
+          .insert(validArticleData)
+          .returning("*"),
+        users
       ]);
+    })
+    .then(([articles, users]) => {
+      const validCommentData = commentJoin(commentData, users, articles);
+      console.log(validCommentData);
+      // return knex("comments")
+      //   .del()
+      //   .insert(validCommentData)
+      //   .returning("*");
     });
 };
-
-
-export.seed = function(knex,Promise) {
-    
-  return knex("topics").del()
-  .then(() => {
-    return knex('topics').insert(topicsData).returning('*')
-    .then(topicsRows => {
-      console.log(topicsRows) // <-- now have access to the topic rows in our database...
-    })
-}
