@@ -2,38 +2,37 @@ const {
   topicData,
   userData,
   articleData,
-  commentData
-} = require("../db/data/development-data/");
-const { articleJoin, commentJoin } = require("../db/utils");
+  commentData,
+} = require('../db/data/development-data/');
+const { articleJoin, commentJoin } = require('../db/utils');
 
-exports.seed = function(knex, Promise) {
-  return knex("topics")
+exports.seed = function (knex, Promise) {
+  return knex('topics')
     .del()
-    .then(function() {
-      return knex("topics").insert(topicData);
+    .then(() => {
+      return knex('topics').insert(topicData);
     })
     .then(() => {
-      return knex("users")
+      return knex('users')
         .del()
         .insert(userData)
-        .returning("*");
+        .returning('*')
     })
-    .then(users => {
+    .then((users) => {
       const validArticleData = articleJoin(articleData, users);
       return Promise.all([
-        knex("articles")
+        knex('articles')
           .del()
           .insert(validArticleData)
-          .returning("*"),
-        users
-      ]);
+          .returning('*'),
+        users]);
     })
     .then(([articles, users]) => {
       const validCommentData = commentJoin(commentData, users, articles);
       console.log(validCommentData);
-      // return knex("comments")
-      //   .del()
-      //   .insert(validCommentData)
-      //   .returning("*");
+      return knex('comments')
+        .del()
+        .insert(validCommentData)
+        .returning('*');
     });
 };

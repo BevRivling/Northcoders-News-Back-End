@@ -6,7 +6,7 @@ exports.up = function(knex, Promise) {
     commentsTable.integer("article_id").references("articles.article_id");
     commentsTable.integer("votes").defaultTo(0);
     commentsTable.datetime("created_at", 6).defaultTo(knex.fn.now(6));
-    commentsTable.string("body").notNullable();
+    commentsTable.text("body").notNullable();
   });
 };
 exports.down = function(knex, Promise) {
