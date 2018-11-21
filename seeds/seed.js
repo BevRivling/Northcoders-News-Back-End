@@ -3,21 +3,17 @@ const {
   userData,
   articleData,
   commentData,
-} = require('../db/data/development-data/');
+} = require('../db/data');
 const { articleJoin, commentJoin } = require('../db/utils');
 
 exports.seed = function (knex, Promise) {
   return knex('topics')
     .del()
-    .then(() => {
-      return knex('topics').insert(topicData);
-    })
-    .then(() => {
-      return knex('users')
-        .del()
-        .insert(userData)
-        .returning('*')
-    })
+    .then(() => knex('topics').insert(topicData))
+    .then(() => knex('users')
+      .del()
+      .insert(userData)
+      .returning('*'))
     .then((users) => {
       const validArticleData = articleJoin(articleData, users);
       return Promise.all([
@@ -25,11 +21,11 @@ exports.seed = function (knex, Promise) {
           .del()
           .insert(validArticleData)
           .returning('*'),
-        users]);
+        users,
+      ]);
     })
     .then(([articles, users]) => {
       const validCommentData = commentJoin(commentData, users, articles);
-      console.log(validCommentData);
       return knex('comments')
         .del()
         .insert(validCommentData)

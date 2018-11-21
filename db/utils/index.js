@@ -20,16 +20,14 @@ const titleJoin = (rawData, articles) => {
 
 const formatDate = data => new Date(data.created_at);
 
-exports.articleJoin = (articles, users) => {
-  return articles.reduce((validArticles, rawArticle) => {
-    const validArt = { ...rawArticle };
-    validArt.user_id = userJoin(rawArticle, users);
-    delete validArt.created_by;
-    validArt.created_at = formatDate(rawArticle);
-    validArticles.push(validArt);
-    return validArticles;
-  }, []);
-};
+exports.articleJoin = (articles, users) => articles.reduce((validArticles, rawArticle) => {
+  const validArt = { ...rawArticle };
+  validArt.user_id = userJoin(rawArticle, users);
+  delete validArt.created_by;
+  validArt.created_at = formatDate(rawArticle);
+  validArticles.push(validArt);
+  return validArticles;
+}, []);
 
 exports.commentJoin = (comments, users, articles) => {
   return comments.reduce((validComments, rawComment) => {
