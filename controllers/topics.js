@@ -4,7 +4,6 @@ exports.getAllTopics = (req, res, next) => {
   return db('topics')
     .select('*')
     .then((topics) => {
-      console.log(topics)
       if (topics) res.status(200).send(topics);
       else next({ status: 400 });
     })

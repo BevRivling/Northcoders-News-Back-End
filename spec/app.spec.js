@@ -34,5 +34,31 @@ describe('/', () => {
           expect(body.slug).to.equal('unique test slug');
         });
     });
+    it('POST with a malformed body responds with a 400 and an explaination of the error', () => {
+      return request.post(url)
+        .send({ slag: 'unique test slug with wrong key', description: 'too many keys', description2: 'way too many keys' })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).to.equal('Bad Request: malformed body');
+        });
+    });
+    it('All http methods except GET and POST return a 405 and an explaination of the error', () => {
+      const invalidMethods = ['delete', 'put', 'patch', 'trace', 'options'];
+      return Promise.all(invalidMethods.map((method) => {
+        return request[method](url)
+          .expect(405)
+          .then(({ body }) => {
+            expect(body.msg).to.equal('Bad Request: method not available for this endpoint');
+          });
+      }));
+    });
+    it('POST with a legitimate request but invalid entity responds with 422 and explaination of the error', () => {
+      return request.post(url)
+        .send({ slug: 'mitch', description: 'slug - mitch already exists in the table' })
+        .expect(422)
+        .then(({ body }) => {
+          expect(body.msg).to.equal('Bad Request: please insert a unique slug');
+        });
+    });
   });
 });
