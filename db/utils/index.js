@@ -29,15 +29,13 @@ exports.articleJoin = (articles, users) => articles.reduce((validArticles, rawAr
   return validArticles;
 }, []);
 
-exports.commentJoin = (comments, users, articles) => {
-  return comments.reduce((validComments, rawComment) => {
-    const validComm = { ...rawComment };
-    validComm.user_id = userJoin(rawComment, users);
-    delete validComm.created_by;
-    validComm.article_id = titleJoin(rawComment, articles);
-    delete validComm.belongs_to;
-    validComm.created_at = formatDate(rawComment);
-    validComments.push(validComm);
-    return validComments;
-  }, []);
-};
+exports.commentJoin = (comments, users, articles) => comments.reduce((validComments, rawComment) => {
+  const validComm = { ...rawComment };
+  validComm.user_id = userJoin(rawComment, users);
+  delete validComm.created_by;
+  validComm.article_id = titleJoin(rawComment, articles);
+  delete validComm.belongs_to;
+  validComm.created_at = formatDate(rawComment);
+  validComments.push(validComm);
+  return validComments;
+}, []);
