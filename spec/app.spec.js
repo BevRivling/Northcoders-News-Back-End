@@ -60,5 +60,17 @@ describe('/', () => {
           expect(body.msg).to.equal('Bad Request: please insert a unique slug');
         });
     });
+    describe.only('/api/topics/:topic/articles', () => {
+      const urlTopicArticle = '/api/topics/mitch/articles';
+      it('GET returns a 200 and all the articles under a particular topic through a valid topic_id', () => {
+        return request.get(urlTopicArticle)
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.msg).to.be.an('array');
+            expect(body.msg.length).to.equal(11);
+            expect(body.msg[0]).to.have.all.keys(['title', 'article_id', 'topic', 'author', 'body', 'created_at', 'votes', 'comment_count']);
+          });
+      });
+    });
   });
 });

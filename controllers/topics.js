@@ -19,3 +19,20 @@ exports.postTopic = (req, res, next) => {
     })
     .catch(next);
 };
+
+exports.getArticlesByTopic = (req, res, next) => {
+  const { topic } = req.params;
+  // const {}
+  return db('topics')
+    .leftJoin('articles', 'topics.slug', '=', 'articles.topic')
+    .leftJoin('users', 'users.user_id', '=', 'articles.user_id')
+    .leftJoin('comments', 'comments.article_id', '=', 'articles.article_id')
+    .where('topic', topic)
+    .groupBy('articles.article_id', 'users.username', 'topics.slug')
+    .select('articles.title', 'users.username AS author', 'articles.article_id', 'articles.body', 'articles.votes', 'topic', 'articles.created_at')
+    .count('comments.comments_id AS comment_count')
+    .then((articles) => {
+      console.log(articles)
+      res.status(200).send({ msg: articles })
+    });
+};

@@ -11,10 +11,15 @@ module.exports = {
         argsIgnorePattern: "Promise|res|next|^err"
       }
     ],
-    camelcase: 0,
+    "eslint.autoFixOnSave": true,
+    "eslint.run": "onSave",
+    "eslint.provideLintTask": false,
+    'camelcase': 0,
     "func-names": 0,
     "arrow-body-style": ["warn"],
     "no-param-reassign": 0,
-    "prefer-promise-reject-errors": 0
+    "prefer-promise-reject-errors": 0,
+    "files.useExperimentalFileWatcher": false,
+    "git.ignoreLimitWarning": true
   }
 };
