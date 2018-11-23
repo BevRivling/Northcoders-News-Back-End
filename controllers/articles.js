@@ -35,8 +35,9 @@ exports.getArticleById = (req, res, next) => {
     .groupBy('articles.article_id', 'users.username')
     .select('articles.article_id', 'users.username AS author', 'articles.created_at', 'articles.title', 'topic', 'articles.votes')
     .count('comments.comments_id AS comment_count')
-    .then(([article]) => {
-      if (article) res.status(200).send(article);
+    .then((article) => {
+      if (article.length === 0) return next({ code: 404 });
+      if (article.length > 0) res.status(200).send(article);
       else next({ status: 400 });
     })
     .catch(next);
@@ -44,15 +45,17 @@ exports.getArticleById = (req, res, next) => {
 
 exports.patchArticleById = (req, res, next) => {
   const { article_id } = req.params;
-  const validQs = validateQueries(req.query, 'inc_votes');
+  const validQs = validateQueries(req.body, 'inc_votes');
   const { inc_votes } = validQs;
   db('articles')
     .where('articles.article_id', article_id)
     .increment('votes', inc_votes)
     .returning('*')
-    .then(([article]) => {
-      if (article) res.status(202).send(article);
-      else next({ status: 400 });
+    .then((article) => {
+      if (article.length === 0) return next({ code: 404 });
+      if (article.length > 0) {
+        res.status(202).send(article[0]);
+      } else next({ status: 400 });
     })
     .catch(next);
 };
@@ -63,6 +66,7 @@ exports.deleteArticleById = (req, res, next) => {
     .where('articles.article_id', article_id)
     .del()
     .then((body) => {
+      if (body === 0) return (next({ code: 404 }));
       if (body === 1) res.status(204).send({});
       else next({ status: 400 });
     })
@@ -87,28 +91,30 @@ exports.getCommentsByArticleId = (req, res, next) => {
     .offset((p - 1) * limit)
     .orderBy(sort_by, (sort_ascending ? 'asc' : 'desc'))
     .then((body) => {
+      if (body.length === 0) return next({ code: 404 });
       if (body) res.status(200).send(body);
       else next({ status: 400 });
     })
     .catch(next);
 };
 
+
+// Needs 404 handling
 exports.postCommentByArticleId = (req, res, next) => {
   const { article_id } = req.params;
   const postedComment = req.body;
   const validation = Object.keys(postedComment);
   if (validation.includes('body') && validation.includes('user_id') && validation.length === 2) {
-    postedComment.votes = 0;
-    postedComment.created_at = new Date(Date.now());
     postedComment.article_id = article_id;
-    db('comments')
+    return db('comments')
       .insert(postedComment)
       .returning('*')
-      .then(([body]) => {
+      .then((body) => {
+        if (body.length === 0) return next({ code: 404 });
         if (body) res.status(201).send(body);
-        else next({ status: 400 });
-      });
-  } else {
-    next({ code: 400 });
+        else return next({ code: 404 });
+      })
+      .catch(next);
   }
+  next({ code: 400 });
 };

@@ -9,8 +9,10 @@ const {
 } = require('../controllers/articles');
 const { handle405s } = require('../errors');
 
-articlesRouter.route('/')
-  .get(getAllArticles)
+
+articlesRouter.route('/:article_id/comments')
+  .get(getCommentsByArticleId)
+  .post(postCommentByArticleId)
   .all(handle405s);
 
 articlesRouter.route('/:article_id')
@@ -19,9 +21,8 @@ articlesRouter.route('/:article_id')
   .delete(deleteArticleById)
   .all(handle405s);
 
-articlesRouter.route('/:article_id/comments')
-  .get(getCommentsByArticleId)
-  .post(postCommentByArticleId)
+articlesRouter.route('/')
+  .get(getAllArticles)
   .all(handle405s);
 
 module.exports = { articlesRouter };

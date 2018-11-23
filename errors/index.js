@@ -6,9 +6,9 @@ exports.handle400s = (err, req, res, next) => {
 };
 
 exports.handle404s = (err, req, res, next) => {
-  const codesRef404 = { 22007: 'Page not found', 404: 'Page not found' };
-  if (codesRef404[err.code]) {
-    res.status(400).send({ msg: codesRef404[err.code] });
+  const codesRef404 = { 22007: 'Page not found', 404: 'Page not found', 23503: 'Page not found' };
+  if (codesRef404[err.code] === 'Page not found') {
+    res.status(404).send({ msg: codesRef404[err.code] });
   } else next(err);
 };
 

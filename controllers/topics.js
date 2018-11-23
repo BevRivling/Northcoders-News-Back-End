@@ -43,8 +43,13 @@ exports.getArticlesByTopic = (req, res, next) => {
     .offset((p - 1) * limit)
     .orderBy(sort_by, (sort_ascending ? 'asc' : 'desc'))
     .then((articles) => {
-      res.status(200).send({ msg: articles });
-    });
+      if (articles.length === 0) {
+        return next({ code: 404 });
+      }
+      if (articles) res.status(200).send({ msg: articles });
+      else next({ status: 400 });
+    })
+    .catch(next);
 };
 
 exports.postArticleByTopic = (req, res, next) => {

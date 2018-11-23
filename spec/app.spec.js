@@ -15,6 +15,8 @@ describe('/', () => {
     .then(() => knextion.seed.run()));
   after(() => knextion.destroy());
   describe('/api/topics', () => {
+    // *** /API/TOPICS ***
+
     const url = '/api/topics';
     it('GET responds with a 200 and an array of topic objects', () => request
       .get(url)
@@ -92,11 +94,9 @@ describe('/', () => {
         .then(({ body }) => {
           expect(body.msg).to.equal('Bad Request: malformed body');
         }));
-      // it.only('GET and POST with incorrect parametric endpoints return a 404', () => {
-      //   return request.post(`${url}/bevan/articles`).expect(404).then(({ body }) => {
-      //     expect(body.msg).to.equal('Page not found');
-      //   });
-      // });
+      it('GET and POST with incorrect parametric endpoints return a 404', () => request.get(`${url}/bevan/articles`).expect(404).then(({ body }) => {
+        expect(body.msg).to.equal('Page not found');
+      }));
       it('All http methods except GET and POST return a 405 and an explaination of the error', () => {
         const invalidMethods = ['delete', 'put', 'patch', 'trace', 'options'];
         return Promise.all(invalidMethods.map(method => request[method](urlTopicArticle)
@@ -107,6 +107,9 @@ describe('/', () => {
       });
     });
   });
+
+  // *** /API/ARTICLES ***
+
   describe('/api/articles', () => {
     const url = '/api/articles';
     it('GET responds with a 200 and an array of topic objects', () => request
@@ -130,14 +133,35 @@ describe('/', () => {
     })]));
     describe('/api/articles/:article_id', () => {
       it('GET returns a 200 and an article object when passed a valid article_id', () => request.get(`${url}/1`).expect(200).then(({ body }) => {
-        expect(body).to.be.an('object');
+        expect(body[0]).to.be.an('object');
       }));
-      it('PATCH returns a 202 and increments the targeted article\'s vote property by the designated amount', () => request.patch(`${url}/1`).send({ inc_votes: 1 }).expect(202).then(({ body }) => {
-        expect(body.votes).to.equal(101);
-      }));
+      it('PATCH returns a 202 and increments the targeted article\'s vote property by the designated amount', () => request.patch(`${url}/1`)
+        .send({ inc_votes: 1 })
+        .expect(202)
+        .then(({ body }) => {
+          expect(body.votes).to.equal(101);
+        }));
       it('DELETE removes the article, returns a 204 status and an empty object', () => request.delete(`${url}/1`).expect(204).then(({ body }) => {
         expect(body).to.eql({});
       }));
+      it('GET, PATCH, and DELETE with incorrect parametric endpoints return a 404', () => Promise.all([
+        request.get(`${url}/99`).expect(404).then(({ body }) => {
+          expect(body.msg).to.equal('Page not found');
+        }),
+        request.patch(`${url}/99`).expect(404).then(({ body }) => {
+          expect(body.msg).to.equal('Page not found');
+        }),
+        request.delete(`${url}/99`).expect(404).then(({ body }) => {
+          expect(body.msg).to.equal('Page not found');
+        })]));
+      it('All http methods except GET, PATCH, and DELETE return a 405 and an explaination of the error', () => {
+        const invalidMethods = ['post', 'put', 'trace', 'options'];
+        return Promise.all(invalidMethods.map(method => request[method](url)
+          .expect(405)
+          .then(({ body }) => {
+            expect(body.msg).to.equal('Bad Request: method not available for this endpoint');
+          })));
+      });
     });
     describe('/api/articles/:article_id/comments', () => {
       const urlArticleComments = '/api/articles/1/comments';
@@ -167,7 +191,7 @@ describe('/', () => {
         })
         .expect(201)
         .then(({ body }) => {
-          expect(body).to.be.an('object');
+          expect(body[0]).to.be.an('object');
         }));
 
       it('POST with a malformed body responds with a 400 and an explaination of the error', () => request.post(urlArticleComments)
@@ -176,6 +200,20 @@ describe('/', () => {
         .then(({ body }) => {
           expect(body.msg).to.equal('Bad Request: malformed body');
         }));
+
+      it('POST with incorrect parametric endpoints return a 404', () => request.post('/api/articles/99/comments')
+        .send({
+          body:
+              'This is my body',
+          user_id: 1,
+        })
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).to.equal('Page not found');
+        }));
+      it('GET with incorrect parametric endpoints return a 404', () => request.get('/api/articles/99/comments').expect(404).then(({ body }) => {
+        expect(body.msg).to.equal('Page not found');
+      }));
       it('All http methods except GET and POST return a 405 and an explaination of the error', () => {
         const invalidMethods = ['delete', 'put', 'patch', 'trace', 'options'];
         return Promise.all(invalidMethods.map(method => request[method](url)
@@ -186,6 +224,9 @@ describe('/', () => {
       });
     });
   });
+
+  // *** /API/COMMENTS ***
+
   describe('/api/comments', () => {
     describe('/api/comments/:comment_id', () => {
       const url = '/api/comments';
@@ -206,8 +247,26 @@ describe('/', () => {
         .then(({ body }) => {
           expect(body).to.eql({});
         }));
+      it('GET, and POST with incorrect parametric endpoints return a 404', () => Promise.all([
+        request.patch(`${url}/99`).expect(404).then(({ body }) => {
+          expect(body.msg).to.equal('Page not found');
+        }),
+        request.delete(`${url}/99`).expect(404).then(({ body }) => {
+          expect(body.msg).to.equal('Page not found');
+        })]));
+      it('All http methods except PATCH and DELETE return a 405 and an explaination of the error', () => {
+        const invalidMethods = ['post', 'put', 'get', 'trace', 'options'];
+        return Promise.all(invalidMethods.map(method => request[method](url)
+          .expect(405)
+          .then(({ body }) => {
+            expect(body.msg).to.equal('Bad Request: method not available for this endpoint');
+          })));
+      });
     });
   });
+
+  // *** /API/USERS ***
+
   describe('/api/users', () => {
     const url = '/api/users';
     it('GET returns a 200 and an array of user objects', () => request.get(url)
@@ -221,11 +280,25 @@ describe('/', () => {
       it('GET returns a 200 and a user with the associated username', () => request.get(`${url}/butter_bridge`)
         .expect(200)
         .then(({ body }) => {
-          expect(body).to.be.an('object');
-          expect(body.username).to.equal('butter_bridge');
+          expect(body[0]).to.be.an('object');
+          expect(body[0].username).to.equal('butter_bridge');
         }));
     });
+    it('GET with an incorrect parametric endpoint return a 404', () => request.get(`${url}/incorrect_username`).expect(404).then(({ body }) => {
+      expect(body.msg).to.equal('Page not found');
+    }));
+    it('All http methods except GET return a 405 and an explaination of the error', () => {
+      const invalidMethods = ['delete', 'post', 'put', 'patch', 'trace', 'options'];
+      return Promise.all(invalidMethods.map(method => request[method](url)
+        .expect(405)
+        .then(({ body }) => {
+          expect(body.msg).to.equal('Bad Request: method not available for this endpoint');
+        })));
+    });
   });
+
+  // *** /API ***
+
   describe('/api', () => {
     it('GET returns a JSON object describing all the available endpoints', () => request.get('/api')
       .expect(200)

@@ -13,8 +13,9 @@ exports.getUserById = (req, res, next) => {
   return db('users')
     .select('*')
     .where('username', username)
-    .then(([user]) => {
-      if (user) res.status(200).send(user);
+    .then((user) => {
+      if (user.length === 0) return next({ code: 404 });
+      if (user.length > 0) res.status(200).send(user);
       else next({ status: 400 });
     });
 };
