@@ -43,7 +43,6 @@ exports.getArticlesByTopic = (req, res, next) => {
     .offset((p - 1) * limit)
     .orderBy(sort_by, (sort_ascending ? 'asc' : 'desc'))
     .then((articles) => {
-      console.log({ msg: articles });
       res.status(200).send({ msg: articles });
     });
 };

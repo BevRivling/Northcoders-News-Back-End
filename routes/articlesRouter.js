@@ -1,6 +1,11 @@
 const articlesRouter = require('express').Router();
 const {
-  getAllArticles, getArticleById, patchArticleById, deleteArticleById, getCommentsByArticleId, postCommentByArticleId,
+  getAllArticles,
+  getArticleById,
+  patchArticleById,
+  deleteArticleById,
+  getCommentsByArticleId,
+  postCommentByArticleId,
 } = require('../controllers/articles');
 const { handle405s } = require('../errors');
 

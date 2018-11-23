@@ -109,7 +109,6 @@ exports.postCommentByArticleId = (req, res, next) => {
         else next({ status: 400 });
       });
   } else {
-    console.log('whaa');
     next({ code: 400 });
   }
 };

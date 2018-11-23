@@ -92,7 +92,7 @@ describe('/', () => {
         .then(({ body }) => {
           expect(body.msg).to.equal('Bad Request: malformed body');
         }));
-      // it.only('GET and POST with incorrect parametric endpoints return a 404 and a page not found message', () => {
+      // it.only('GET and POST with incorrect parametric endpoints return a 404', () => {
       //   return request.post(`${url}/bevan/articles`).expect(404).then(({ body }) => {
       //     expect(body.msg).to.equal('Page not found');
       //   });
@@ -186,7 +186,7 @@ describe('/', () => {
       });
     });
   });
-  describe.only('/api/comments', () => {
+  describe('/api/comments', () => {
     describe('/api/comments/:comment_id', () => {
       const url = '/api/comments';
       it('PATCH returns a 202 increments the targeted comment\'s vote property by the designated amount', () => Promise.all([request.patch(`${url}/1`)
@@ -207,5 +207,32 @@ describe('/', () => {
           expect(body).to.eql({});
         }));
     });
+  });
+  describe('/api/users', () => {
+    const url = '/api/users';
+    it('GET returns a 200 and an array of user objects', () => request.get(url)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body).to.be.an('array');
+        expect(body.length).to.equal(3);
+        expect(body[0]).to.have.all.keys(['user_id', 'username', 'avatar_url', 'name']);
+      }));
+    describe('/api/users/:username', () => {
+      it('GET returns a 200 and a user with the associated username', () => request.get(`${url}/butter_bridge`)
+        .expect(200)
+        .then(({ body }) => {
+          expect(body).to.be.an('object');
+          expect(body.username).to.equal('butter_bridge');
+        }));
+    });
+  });
+  describe.only('/api', () => {
+    it('GET returns a JSON object describing all the available endpoints', () => {
+      return request.get('/api')
+        .expect(200)
+        .then(({ body }) => {
+          expect(body).to.be.an('object')
+        })
+    })
   });
 });
