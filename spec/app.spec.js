@@ -226,13 +226,13 @@ describe('/', () => {
         }));
     });
   });
-  describe.only('/api', () => {
-    it('GET returns a JSON object describing all the available endpoints', () => {
-      return request.get('/api')
-        .expect(200)
-        .then(({ body }) => {
-          expect(body).to.be.an('object')
-        })
-    })
+  describe('/api', () => {
+    it('GET returns a JSON object describing all the available endpoints', () => request.get('/api')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body).to.be.an('object');
+        expect(body).to.have.keys(['Articles', 'Comments', 'Topics', 'Users']);
+        expect(body.Articles).to.have.keys(['GET', 'POST', 'PATCH', 'DELETE']);
+      }));
   });
 });
