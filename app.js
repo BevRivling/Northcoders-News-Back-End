@@ -1,17 +1,17 @@
-const express = require('express');
+const express = require("express");
 
 const app = express();
 
-const bodyparser = require('body-parser');
-const {
-  handle400s, handle404s, handle422s, handle500s,
-} = require('./errors');
-const { apiRouter } = require('./routes/apiRouter');
+const bodyparser = require("body-parser");
+const { handle400s, handle404s, handle422s, handle500s } = require("./errors");
+const { apiRouter } = require("./routes/apiRouter");
 
 app.use(bodyparser.json());
 
-app.use('/api', apiRouter);
-
+app.use("/api", apiRouter);
+app.use("/*", (req, res, next) =>
+  res.status(404).send({ msg: "Page not found" })
+);
 
 // Error Handling ----->
 app.use(handle400s);
