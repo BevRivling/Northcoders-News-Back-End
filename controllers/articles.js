@@ -24,6 +24,7 @@ exports.getAllArticles = (req, res, next) => {
       "users.username AS author",
       "articles.created_at",
       "articles.title",
+      "articles.body",
       "topic",
       "articles.votes"
     )
@@ -50,6 +51,7 @@ exports.getArticleById = (req, res, next) => {
       "users.username AS author",
       "articles.created_at",
       "articles.title",
+      "articles.body",
       "topic",
       "articles.votes"
     )
