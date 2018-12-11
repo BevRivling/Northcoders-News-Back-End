@@ -58,7 +58,7 @@ exports.getArticleById = (req, res, next) => {
     .count("comments.comments_id AS comment_count")
     .then(article => {
       if (article.length === 0) return next({ code: 404 });
-      if (article.length > 0) res.status(200).send(article);
+      if (article.length > 0) res.status(200).send(article[0]);
       else next({ status: 400 });
     })
     .catch(next);
