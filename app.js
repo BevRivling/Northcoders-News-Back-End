@@ -1,6 +1,8 @@
 const express = require("express");
+const cors = require("cors");
 
 const app = express();
+app.use(cors());
 
 const bodyparser = require("body-parser");
 const { handle400s, handle404s, handle422s, handle500s } = require("./errors");
