@@ -73,6 +73,7 @@ exports.postArticleByTopic = (req, res, next) => {
     .select("*")
     .then(usersData => {
       const articleBody = articleJoin([req.body], usersData);
+      console.log(articleBody);
       return db("articles")
         .insert(articleBody)
         .returning("*");
